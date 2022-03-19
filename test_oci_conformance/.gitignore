@@ -1,0 +1,9 @@
+# Vendored Go dependencies
+vendor/
+
+# Test reports
+junit.xml
+report.html
+
+# Testing binary
+conformance.test
