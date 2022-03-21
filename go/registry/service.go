@@ -1,6 +1,10 @@
 package registry
 
-import "io"
+import (
+	"io"
+
+	"github.com/google/uuid"
+)
 
 type Service struct {
 	db      Database
@@ -9,6 +13,14 @@ type Service struct {
 
 func NewService(db Database, storage Storage) *Service {
 	return &Service{db, storage}
+}
+
+func (srv *Service) GetBlobByID(id uuid.UUID) (*Blob, error) {
+	return srv.db.GetBlobByID(id)
+}
+
+func (srv *Service) GetImageManifestByRepositoryAndRef(r *Repository, ref string) (*ImageManifest, error) {
+	return srv.db.GetImageManifestByRepositoryIDAndRef(r.ID, ref)
 }
 
 func (srv *Service) GetRepositoryByName(name string) (*Repository, error) {
@@ -24,8 +36,8 @@ func (srv *Service) OpenBlobUploadSession(r *Repository) (*BlobUploadSession, er
 	return bus, nil
 }
 
-func (srv *Service) GetBlobUploadSessionByRepositoryAndID(r *Repository, id string) (*BlobUploadSession, error) {
-	return srv.db.GetBlobUploadSessionByRepositoryAndID(r, id)
+func (srv *Service) GetBlobUploadSessionByRepositoryAndID(r *Repository, id uuid.UUID) (*BlobUploadSession, error) {
+	return srv.db.GetBlobUploadSessionByRepositoryIDAndID(r.ID, id)
 }
 
 func (srv *Service) CloseBlobUploadSession(bus *BlobUploadSession) (*Blob, error) {
@@ -46,4 +58,8 @@ func (srv *Service) AppendChunk(bus *BlobUploadSession, dataReader io.Reader, si
 		return nil, err
 	}
 	return c, nil
+}
+
+func (srv *Service) WriteBlob(b *Blob, w io.Writer) error {
+	return nil
 }

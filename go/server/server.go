@@ -78,7 +78,26 @@ func NewServer(cfg config.Config, registrySrv *registry.Service) *http.Server {
 
 	{
 		registryAPIRouter := router.Group("/v2")
-		registryAPIRouter.POST("/:repository_name/blobs/uploads", registry_api.OpenBlobUploadSession(registrySrv))
+		registryAPIRouter.GET(
+			":repository_name/blobs/:digest",
+			registry_api.GetBlob(registrySrv),
+		)
+		registryAPIRouter.GET(
+			"/:repository_name/manifest/:manifestRef",
+			registry_api.GetImageManifest(registrySrv),
+		)
+		registryAPIRouter.POST(
+			"/:repository_name/blobs/uploads",
+			registry_api.OpenBlobUploadSession(registrySrv),
+		)
+		registryAPIRouter.PUT(
+			"/:repository_name/blobs/uploads/:sessionID",
+			registry_api.UploadChunkAndCloseBlobUploadSession(registrySrv),
+		)
+		registryAPIRouter.PATCH(
+			"/:repository_name/blobs/uploads/:sessionID",
+			registry_api.UploadChunk(registrySrv),
+		)
 	}
 
 	return &http.Server{
