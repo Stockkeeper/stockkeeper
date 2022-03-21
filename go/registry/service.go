@@ -3,16 +3,16 @@ package registry
 import "io"
 
 type Service struct {
-	db      DB
+	db      Database
 	storage Storage
 }
 
-func NewService(db DB, storage Storage) *Service {
+func NewService(db Database, storage Storage) *Service {
 	return &Service{db, storage}
 }
 
 func (srv *Service) GetRepositoryByName(name string) (*Repository, error) {
-	return &Repository{}, nil
+	return srv.db.GetRepositoryByName(name)
 }
 
 func (srv *Service) OpenBlobUploadSession(r *Repository) (*BlobUploadSession, error) {
@@ -22,6 +22,10 @@ func (srv *Service) OpenBlobUploadSession(r *Repository) (*BlobUploadSession, er
 	}
 	srv.db.InsertBlobAndBlobUploadSession(b, bus)
 	return bus, nil
+}
+
+func (srv *Service) GetBlobUploadSessionByRepositoryAndID(r *Repository, id string) (*BlobUploadSession, error) {
+	return srv.db.GetBlobUploadSessionByRepositoryAndID(r, id)
 }
 
 func (srv *Service) CloseBlobUploadSession(bus *BlobUploadSession) (*Blob, error) {

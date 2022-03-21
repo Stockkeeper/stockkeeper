@@ -22,3 +22,6 @@ func (*FakeDatabase) InsertChunkAndUpdateBlobUploadSession(c *registry.Chunk, bu
 func (*FakeDatabase) DeleteBlobUploadSessionAndUpdateBlob(bus *registry.BlobUploadSession) (*registry.Blob, error) {
 	return nil, nil
 }
+func (*FakeDatabase) GetBlobUploadSessionByRepositoryAndID(r *registry.Repository, id string) (*registry.BlobUploadSession, error) {
+	return nil, nil
+}
