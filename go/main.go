@@ -5,17 +5,18 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Stockkeeper/stockkeeper/config"
-	"github.com/Stockkeeper/stockkeeper/server"
+	"github.com/Stockkeeper/stockkeeper/go/config"
+	"github.com/Stockkeeper/stockkeeper/go/database"
+	"github.com/Stockkeeper/stockkeeper/go/registry"
+	"github.com/Stockkeeper/stockkeeper/go/server"
+	"github.com/Stockkeeper/stockkeeper/go/storage"
 )
 
 const (
-	generateConfigFileCommandName        = "gen-config"
-	generateConfigFileCommandDescription = "Generates a config file."
-	startServerCommandName               = "start-server"
-	startServerCommandDescription        = "Starts the API server."
-	upgradeSchemaUpCommandName           = "db-up"
-	upgradeSchemaUpCommandDescription    = "Upgrades the application database schema."
+	startServerCommandName            = "start-server"
+	startServerCommandDescription     = "Starts the API server."
+	upgradeSchemaUpCommandName        = "db-up"
+	upgradeSchemaUpCommandDescription = "Upgrades the application database schema."
 )
 
 func main() {
@@ -30,11 +31,8 @@ Commands:
 
 %-16v %v
 %-16v %v
-%-16v %v
 
 `,
-			generateConfigFileCommandName,
-			generateConfigFileCommandDescription,
 			startServerCommandName,
 			startServerCommandDescription,
 			upgradeSchemaUpCommandName,
@@ -64,9 +62,14 @@ func startServer() {
 		panic(err)
 	}
 
-	listenAddr := fmt.Sprintf("%v:%v", c.ServerHost, c.ServerPort)
-	fmt.Printf("Starting server on %v\n", listenAddr)
-	if err := server.NewServer(listenAddr).ListenAndServe(); err != nil {
+	db := &database.FakeDatabase{}
+	storage := &storage.FakeStorage{}
+
+	registrySrv := registry.NewService(db, storage)
+
+	s := server.NewServer(c, registrySrv)
+	fmt.Printf("Starting server on %v\n", s.Addr)
+	if err := s.ListenAndServe(); err != nil {
 		panic(err)
 	}
 }

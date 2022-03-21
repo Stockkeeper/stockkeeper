@@ -12,15 +12,15 @@ type Config struct {
 }
 
 func ParseConfig(filepath string) (Config, error) {
-	var c Config
+	var cfg Config
 	data, err := os.ReadFile(filepath)
 	if err != nil {
-		return c, err
+		return cfg, err
 	}
 
-	if err != yaml.Unmarshal(data, &c) {
-		return c, err
+	if err != yaml.Unmarshal(data, &cfg) {
+		return cfg, err
 	}
 
-	return c, nil
+	return cfg, nil
 }

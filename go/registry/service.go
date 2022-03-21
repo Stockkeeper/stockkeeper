@@ -3,11 +3,12 @@ package registry
 import "io"
 
 type Service struct {
-	db DB
+	db      DB
+	storage Storage
 }
 
-func NewService() *Service {
-	return &Service{}
+func NewService(db DB, storage Storage) *Service {
+	return &Service{db, storage}
 }
 
 func (srv *Service) GetRepositoryByName(name string) (*Repository, error) {
@@ -28,7 +29,9 @@ func (srv *Service) CloseBlobUploadSession(bus *BlobUploadSession) (*Blob, error
 }
 
 func (srv *Service) AppendChunk(bus *BlobUploadSession, dataReader io.Reader, size uint, rangeStart uint, rangeEnd uint) (*Chunk, error) {
-	// TODO: Upload the `data` to object storage.
+	key := "my-chunk"
+	srv.storage.Set(key, dataReader)
+
 	c := &Chunk{
 		BlobID:     bus.BlobID,
 		Size:       size,

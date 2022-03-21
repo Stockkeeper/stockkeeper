@@ -1,20 +1,21 @@
 package server
 
 import (
+	"fmt"
 	"io"
 	"io/fs"
 	"net/http"
 	"strings"
 
-	"github.com/Stockkeeper/stockkeeper/config"
-	"github.com/Stockkeeper/stockkeeper/frontend"
-	"github.com/Stockkeeper/stockkeeper/registry"
-	"github.com/Stockkeeper/stockkeeper/server/registry_api"
+	"github.com/Stockkeeper/stockkeeper/go/config"
+	"github.com/Stockkeeper/stockkeeper/go/frontend"
+	"github.com/Stockkeeper/stockkeeper/go/registry"
+	"github.com/Stockkeeper/stockkeeper/go/server/registry_api"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gin-gonic/gin"
 )
 
-func NewServer(config config.Config, registryService *registry.Service) *http.Server {
+func NewServer(cfg config.Config, registrySrv *registry.Service) *http.Server {
 	router := gin.Default()
 
 	{
@@ -77,11 +78,11 @@ func NewServer(config config.Config, registryService *registry.Service) *http.Se
 
 	{
 		registryAPIRouter := router.Group("/v2")
-		registryAPIRouter.POST("/:repository_name/blobs/uploads", registry_api.HandlePostBlobUploadSession(registryService))
+		registryAPIRouter.POST("/:repository_name/blobs/uploads", registry_api.OpenBlobUploadSession(registrySrv))
 	}
 
 	return &http.Server{
-		Addr:    listenAddress,
+		Addr:    fmt.Sprintf("%v:%v", cfg.ServerHost, cfg.ServerPort),
 		Handler: router,
 	}
 }

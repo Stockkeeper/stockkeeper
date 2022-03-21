@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Stockkeeper/stockkeeper/registry"
+	"github.com/Stockkeeper/stockkeeper/go/registry"
 	"github.com/gin-gonic/gin"
 )
 
